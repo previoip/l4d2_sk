@@ -1,0 +1,120 @@
+{
+  "config": {
+    "appid": "550",
+    "appidDedicatedServer": "222860",
+    "installForceDir": "l4d2",
+    "usePlatform": "windows"
+  },
+  "metaPlugins": [
+    {
+      "name": "sourcemod",
+      "extractPath": "left4dead2",
+      "resources": [
+        {
+          "platform": "windows",
+          "url": "https://sm.alliedmods.net/smdrop/1.11/sourcemod-1.11.0-git6956-windows.zip",
+          "fileName": "sourcemod-1.11.0-git6956-windows.zip"
+        },
+        {
+          "platform": "linux",
+          "url": "https://sm.alliedmods.net/smdrop/1.11/sourcemod-1.11.0-git6956-linux.tar.gz",
+          "fileName": "sourcemod-1.11.0-git6956-linux.tar.gz"
+        }
+      ]
+    },
+    {
+      "name": "metamod",
+      "extractPath": "left4dead2",
+      "resources": [
+        {
+          "platform": "windows",
+          "url": "https://mms.alliedmods.net/mmsdrop/1.11/mmsource-1.11.0-git1153-windows.zip",
+          "fileName": "mmsource-1.11.0-git1153-windows.zip"
+        },
+        {
+          "platform": "linux",
+          "url": "https://mms.alliedmods.net/mmsdrop/1.11/mmsource-1.11.0-git1153-linux.tar.gz",
+          "fileName": "mmsource-1.11.0-git1153-linux.tar.gz"
+        }
+      ]
+    }
+  ],
+
+  "plugins": [
+    {
+      "name": "",
+      "_ref": "",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "",
+          "doCompile": false,
+          "compilerLocation": "",
+          "compilerParams": [
+            {
+              "in": [],
+              "out": []
+            }
+          ],
+          "extractPath": "left4dead2/addons/sourcemod/plugins",
+          "fileName": ""
+        }
+      ]
+    },
+    {
+      "name": "l4dtoolz",
+      "_ref": "https://forums.alliedmods.net/showpost.php?p=1984946&amp;postcount=1211?p=1984946&amp;postcount=1211",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?s=e0406bf43fbf79b62aa35fe08eca2b58&attachmentid=122230&d=1373147952",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins",
+          "fileName": "l4dtoolz(L4D2)-1.0.0.9h.zip"
+        }
+      ]
+    },
+    {
+      "name": "left4downtown2",
+      "_ref": "https://forums.alliedmods.net/showthread.php?t=134032",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=111241&d=1350927414",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins",
+          "fileName": "left4downtown2-v0.5.4.2-playerslots.zip"
+        }
+      ]
+    },
+    {
+      "name": "bebop",
+      "_ref": "https://forums.alliedmods.net/showthread.php?p=1000446",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=54217&d=1259334888",
+          "doCompile": true,
+          "compilerLocation": "left4dead2/commons/addons/sourcemod/scripting/compile.sh",
+          "compilerParams": [
+            {
+              "in": [
+                "bebop.sp"
+              ],
+              "out": [
+                "bebop.smx"
+              ]
+            }
+          ],
+          "extractPath": "left4dead2/addons/sourcemod/plugins",
+          "fileName": "bebop_0.2beta.zip"
+        }
+      ]
+    }
+  ],
+  "workshopIds": [
+    ["https://steamcommunity.com/sharedfiles/filedetails/?id=2458892093", "2458892093"],
+    ["https://steamcommunity.com/sharedfiles/filedetails/?id=2465072250", "2465072250"]
+  ]
+
+}
