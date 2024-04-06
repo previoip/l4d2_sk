@@ -2,6 +2,7 @@
   "config": {
     "appid": "550",
     "appidDedicatedServer": "222860",
+    "filePathDedicatedServer": "srcds.exe",
     "installForceDir": "l4d2",
     "usePlatform": "windows"
   },
@@ -108,6 +109,30 @@
           ],
           "extractPath": "left4dead2/addons/sourcemod/plugins",
           "fileName": "bebop_0.2beta.zip"
+        }
+      ]
+    },
+    {
+      "name": "Remove Lobby Reservation (When Full) 1.1.1",
+      "_ref": "https://forums.alliedmods.net/showthread.php?t=94415",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://www.sourcemod.net/vbcompiler.php?file_id=56931",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
+        }
+      ]
+    },
+    {
+      "name": "Grenade Transfer",
+      "_ref": "https://forums.alliedmods.net/showthread.php?t=122293",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://www.sourcemod.net/vbcompiler.php?file_id=62150",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
         }
       ]
     }
