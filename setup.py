@@ -60,6 +60,7 @@ class Main:
         continue
       plugin_extract_path = plugin.get('extractPath')
       plugin_resources = plugin.get('resources', [])
+      plugin_disable_cache = plugin.get('disableCache', False)
       for resource in plugin_resources:
         resource_exclude = resource.get('exclude', False)
         if resource_exclude:
@@ -83,12 +84,12 @@ class Main:
             continue
           resource_extract_path = plugin_extract_path
 
-        status, export_path, info = http_utils.download_file(self.session, resource_url, self.temp_download_dir)
+        status, export_path, info = http_utils.download_file(self.session, resource_url, self.temp_download_dir, use_cache=not bool(plugin_disable_cache))
         if not status:
           logger.warning('failed to retrieve content: {} {}'.format(plugin_name, resource_url))
           continue
 
-        if info.content_type == 'application/zip':
+        if info.content_type == 'application/zip' or info.file_type == 'zip':
           logger.info('extracting zip: {}'.format(info.file_name))
           file_utils.extract_zip(export_path, man.get_app_path(resource_extract_path), self.tmpdir)
         elif info.content_type == 'application/x-xz':

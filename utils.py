@@ -154,7 +154,7 @@ class file_utils:
     with ZipFile(path) as zh:
       zh.extractall(zip_tempdir)
       cls.copy2_r(zip_tempdir, dst)
-    cls.validate_r(zip_tempdir, dst)
+    # cls.validate_r(zip_tempdir, dst)
     if tmpdir is None:
       d_zip_tempdir()
     else:
@@ -185,23 +185,43 @@ class http_utils:
   cache_dict = None
   s_file_info = namedtuple("FileInfo", field_names=['file_name', 'file_type',  'file_size', 'content_disposition', 'content_type'])
 
-  @staticmethod
-  def head(session: Session, url):
+  @classmethod
+  def http_request(cls, method, session: Session, url, stream=False, max_depth=10):
+    http_utils_logger.info('{} request: {}'.format(method, url))
+    resp = session.request(method, url, stream=stream)
+    if resp.status_code == 200:
+      return resp
+    elif resp.status_code == 301 or resp.status_code == 302:
+      for i in range(max_depth):
+        new_url = resp.headers.get('location')
+        if new_url is None:
+          new_url = resp.url
+        if i > max_depth//2:
+          stream = False
+        http_utils_logger.info('redirecting {} request (stream:{}): {}'.format(method, stream, url))
+        new_resp = session.request(method, new_url, stream=stream, allow_redirects=False)
+        if new_resp.status_code == 200:
+          return new_resp
+        elif resp.status_code == 301 or resp.status_code == 302:
+          resp = new_resp
+        else:
+          raise RequestsExceptionConnectionError('redirected connection cannot be established: {} {}'.format(new_resp.status_code, new_resp.reason))
+    else:
+      raise RequestsExceptionConnectionError('connection cannot be established: {} {}'.format(resp.status_code, resp.reason))
+
+  @classmethod
+  def head(cls, session: Session, url):
     try:
-      resp = session.head(url)
-      if not resp.status_code == 200:
-        raise RequestsExceptionConnectionError('connection cannot be established: {} {}'.format(resp.status_code, resp.reason))
+      resp = cls.http_request('HEAD', session, url)
     except Exception as e:
       http_utils_logger.error(e)
       return None
     return resp
 
-  @staticmethod
-  def get(session: Session, url, stream=False):
+  @classmethod
+  def get(cls, session: Session, url, stream=False):
     try:
-      resp = session.get(url, stream=stream)
-      if not resp.status_code == 200:
-        raise RequestsExceptionConnectionError('connection cannot be established: {} {}'.format(resp.status_code, resp.reason))
+      resp = cls.http_request('GET', session, url, stream=True)
     except Exception as e:
       http_utils_logger.error(e)
       return None
@@ -279,11 +299,11 @@ class http_utils:
     return True, info
 
   @classmethod
-  def download_file(cls, session, url, export_dir, buf:IOBase=None):
+  def download_file(cls, session, url, export_dir, buf:IOBase=None, use_cache=True):
     if buf is None:
       buf = BytesIO()
 
-    if cls._cache_has_key(url):
+    if use_cache and cls._cache_has_key(url):
       cached_path, cached_info = cls._cache_get(url)
       http_utils_logger.info('using cached file: {}'.format(cached_path))
       cached_export_path = file_utils.path_join(export_dir, cached_info.file_name)
@@ -300,7 +320,7 @@ class http_utils:
 
     export_path = file_utils.path_join(export_dir, info.file_name)
 
-    if file_utils.isfile(export_path):
+    if use_cache and file_utils.isfile(export_path):
       file_utils_logger.info('file already exists: {}'.format(export_path))
       return True, export_path, info
 
@@ -312,7 +332,7 @@ class http_utils:
         fh.write(buf.read())
       file_utils.ensure_dir(cls.cache_dir)
 
-    if status: # and not cls._cache_has_key(url)
+    if status and use_cache: # and not cls._cache_has_key(url)
       cache_path = file_utils.path_join(cls.cache_dir, info.file_name)
       with open(cache_path, 'wb') as fh:
         buf.seek(0)
