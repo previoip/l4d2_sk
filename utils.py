@@ -6,13 +6,16 @@ import re
 import json
 import time
 import subprocess
-from shutil import rmtree, copy2
+import tarfile
+import filecmp
+from shutil import rmtree, copy
 from requests import Session, Response, ConnectionError as RequestsExceptionConnectionError
 from urllib.parse import urlparse
 from collections import namedtuple
 from io import IOBase, BytesIO
 from math import isclose
 from zipfile import ZipFile
+
 
 class logging_utils:
   fmt_default = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -32,6 +35,8 @@ class logging_utils:
       logger_h = logging.FileHandler(os.path.join('./log', name + '.log'))
       logger_h.setFormatter(cls.fmt_default)
       logger.addHandler(logger_h)
+    logger.info('')
+    logger.info('='*48)
     return logger
 
 
@@ -73,9 +78,12 @@ class file_utils:
     destructor_f = functools.partial(destructor, tmpdir)
     return tmpdir, destructor_f
 
-  @staticmethod
-  def ensure_dir(path):
-    os.makedirs(path, exist_ok=True)
+  @classmethod
+  def ensure_dir(cls, path):
+    if not cls.isdir(path):
+      os.makedirs(path, exist_ok=True)
+      return path
+    return None
 
   @staticmethod
   def isdir(path):
@@ -104,8 +112,7 @@ class file_utils:
   @classmethod
   def copy2(cls, src, dst):
     cls.ensure_dir(os.path.dirname(dst))
-    copy2(src, dst)
-
+    copy(src, dst)
 
   @classmethod
   def copy2_r(cls, src, dst):
@@ -113,12 +120,29 @@ class file_utils:
       rel_dest = os.path.join(dst, os.path.relpath(root, src))
       for d in dirs:
         dst_dir = os.path.join(rel_dest, d)
-        print('> {}'.format(dst_dir))
-        cls.ensure_dir(dst_dir)
+        d_dst = cls.ensure_dir(dst_dir)
+        if not d_dst is None:
+          print(') {}'.format(dst_dir))
       for f in files:
         dst_file = os.path.join(rel_dest, f)
-        print('> {}'.format(dst_file))
-        copy2(os.path.join(root, f), dst_file)
+        d_dst = cls.copy2(os.path.join(root, f), dst_file)
+        if not d_dst is None:
+          print('> {}'.format(d_dst))
+
+  @classmethod
+  def validate_r(cls, src, dst):
+    file_utils_logger.info('validating directory: {} -> {}'.format(src, dst))
+    for root, dirs, files, in os.walk(src):
+      rel_dest = os.path.join(dst, os.path.relpath(root, src))
+      for f in files:
+        dst_file = os.path.join(rel_dest, f)
+        res = filecmp.cmp(os.path.join(root, f), dst_file)
+        if not res: 
+          if file_utils.isfile(dst_file):
+            file_utils_logger.error('there is a problem copying file: {}'.format(dst_file))
+          elif not file_utils.isfile(os.path.join(root, f)):
+            file_utils_logger.error('src file missing')
+
 
   @classmethod
   def extract_zip(cls, path, dst, tmpdir=None):
@@ -130,8 +154,24 @@ class file_utils:
     with ZipFile(path) as zh:
       zh.extractall(zip_tempdir)
       cls.copy2_r(zip_tempdir, dst)
+    cls.validate_r(zip_tempdir, dst)
     if tmpdir is None:
       d_zip_tempdir()
+    else:
+      cls.rmtree_d(zip_tempdir)
+
+  @classmethod
+  def extract_tar_xz(cls, path, dst, tmpdir=None):
+    if tmpdir is None:
+      tar_tempdir, d_tar_tempdir = cls.mkdtemp()
+    else:
+      d_tar_tempdir = lambda: None
+      tar_tempdir = tmpdir
+    with tarfile.open(path, mode='r') as th:
+      th.extractall(tar_tempdir)
+      cls.copy2_r(tar_tempdir, dst)
+    if tmpdir is None:
+      d_tar_tempdir()
     else:
       cls.rmtree_d(zip_tempdir)
 
@@ -140,6 +180,9 @@ http_utils_logger = logging_utils.init_logger('http_utils')
 
 class http_utils:
 
+  cache_dir = './cache'
+  cache_index_path = './cache/_index.dat'
+  cache_dict = None
   s_file_info = namedtuple("FileInfo", field_names=['file_name', 'file_type',  'file_size', 'content_disposition', 'content_type'])
 
   @staticmethod
@@ -206,10 +249,9 @@ class http_utils:
     if resp is None:
       return False, None
 
+    info = cls.parse_file_info(resp.headers, url)
     t0 = time.time()
     tn = t0
-
-    info = cls.parse_file_info(resp.headers, url)
     tl = 0.0
     dl = 0.0
     total_l = info.file_size
@@ -226,19 +268,31 @@ class http_utils:
           print('downloading: {:>7.02f}% {:>10.02f}kb/s'.format(frac*100, dl/dt/1000))
           tn = time.time()
           dl = 0
+      if not isclose(0, total_l) and not isclose(tl, total_l):
+        raise RequestsExceptionConnectionError('downloaded file size does not match with content-length')
       print('done downloading')
-
     except Exception as e:
       http_utils_logger.error(e)
       print('error occurred while downloading: {}'.format(e))
       return False, info
 
-    return isclose(tl, total_l), info
+    return True, info
 
   @classmethod
   def download_file(cls, session, url, export_dir, buf:IOBase=None):
     if buf is None:
       buf = BytesIO()
+
+    if cls._cache_has_key(url):
+      cached_path, cached_info = cls._cache_get(url)
+      http_utils_logger.info('using cached file: {}'.format(cached_path))
+      cached_export_path = file_utils.path_join(export_dir, cached_info.file_name)
+      if file_utils.isfile(cached_export_path):
+        file_utils_logger.info('file already exists (cached): {}'.format(cached_export_path))
+        return True, cached_export_path, cached_info
+      with open(cached_path, 'rb') as fh:
+        buf.write(fh.read())
+        return True, cached_export_path, cached_info
 
     info = cls.request_file_info(session, url)
     if info is None:
@@ -252,12 +306,72 @@ class http_utils:
 
     status, _ = cls.get_stream_to_io(session, url, buf)
     if status:
-      buf.seek(0)
       file_utils.ensure_dir(export_dir)
       with open(export_path, 'wb') as fh:
+        buf.seek(0)
         fh.write(buf.read())
+      file_utils.ensure_dir(cls.cache_dir)
+
+    if status: # and not cls._cache_has_key(url)
+      cache_path = file_utils.path_join(cls.cache_dir, info.file_name)
+      with open(cache_path, 'wb') as fh:
+        buf.seek(0)
+        fh.write(buf.read())
+      cls._cache_add(url, cache_path, info)
+
     return status, export_path, info
 
+  @classmethod
+  def _cache_is_index_loaded(cls):
+    return not cls.cache_dict is None
+
+  @classmethod
+  def _cache_has_key(cls, url):
+    return cls._cache_is_index_loaded() and not cls.cache_dict.get(url) is None
+
+  @classmethod
+  def _cache_ensure(cls):
+    if not cls._cache_is_index_loaded():
+      cls.cache_dict = dict()
+
+  @classmethod
+  def _cache_load(cls):
+    if cls._cache_is_index_loaded():
+      return
+    cls._cache_ensure()
+    file_utils.ensure_dir(cls.cache_dir)
+    if file_utils.isfile(cls.cache_index_path):
+      with open(cls.cache_index_path, 'r') as fh:
+        for line in fh.readlines():
+          k, v = line.split('|')
+          v = json.loads(v)
+          cls.cache_dict.update({k:v})
+
+  @classmethod
+  def _cache_save(cls):
+    file_utils.ensure_dir(cls.cache_dir)
+    if not cls.cache_dict is None:
+      with open(cls.cache_index_path, 'w') as fh:
+        fh.writelines(map(lambda x: '{}|{}\n'.format(x[0], json.dumps(x[1])), cls.cache_dict.items()))
+
+  @classmethod
+  def _cache_add(cls, url, cached_file_path, info):
+    cls._cache_ensure()
+    cls.cache_dict.update({url: [
+      cached_file_path,
+      [
+        info.file_name,
+        info.file_type,
+        info.file_size,
+        info.content_disposition,
+        info.content_type
+      ]
+    ]})
+
+  @classmethod
+  def _cache_get(cls, url):
+    cached_file_path, info = cls.cache_dict.get(url)
+    return cached_file_path, cls.s_file_info(*info)
 
 steamapp_logger = logging_utils.init_logger('steamapp_man')
 
@@ -287,8 +401,8 @@ class SteamAppManager:
     self._passwd = passwd
 
   @classmethod
-  def get_steamcmd_path(cls):
-    return os.path.join(cls.steamcmd_dir, cls.steamcmd_file_name)
+  def get_steamcmd_path(cls, *tails):
+    return os.path.join(cls.steamcmd_dir, cls.steamcmd_file_name, *tails)
 
   @classmethod
   def is_steamcmd_installed(cls):
@@ -328,8 +442,8 @@ class SteamAppManager:
     ]
     return args + ['+quit']
 
-  def update_app(self):
-    return subprocess.call(self.prepare_args_update_app(validate=False))
+  def update_app(self, validate=False):
+    return subprocess.call(self.prepare_args_update_app(validate=validate))
 
   def workshop_download_item(self, workshop_item_id):
     retcode = subprocess.call(self.prepare_args_workshop_download_item(workshop_item_id=workshop_item_id))

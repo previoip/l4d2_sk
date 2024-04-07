@@ -13,13 +13,11 @@
       "resources": [
         {
           "platform": "windows",
-          "url": "https://sm.alliedmods.net/smdrop/1.11/sourcemod-1.11.0-git6956-windows.zip",
-          "fileName": "sourcemod-1.11.0-git6956-windows.zip"
+          "url": "https://sm.alliedmods.net/smdrop/1.11/sourcemod-1.11.0-git6956-windows.zip"
         },
         {
           "platform": "linux",
-          "url": "https://sm.alliedmods.net/smdrop/1.11/sourcemod-1.11.0-git6956-linux.tar.gz",
-          "fileName": "sourcemod-1.11.0-git6956-linux.tar.gz"
+          "url": "https://sm.alliedmods.net/smdrop/1.11/sourcemod-1.11.0-git6956-linux.tar.gz"
         }
       ]
     },
@@ -29,13 +27,11 @@
       "resources": [
         {
           "platform": "windows",
-          "url": "https://mms.alliedmods.net/mmsdrop/1.11/mmsource-1.11.0-git1153-windows.zip",
-          "fileName": "mmsource-1.11.0-git1153-windows.zip"
+          "url": "https://mms.alliedmods.net/mmsdrop/1.11/mmsource-1.11.0-git1153-windows.zip"
         },
         {
           "platform": "linux",
-          "url": "https://mms.alliedmods.net/mmsdrop/1.11/mmsource-1.11.0-git1153-linux.tar.gz",
-          "fileName": "mmsource-1.11.0-git1153-linux.tar.gz"
+          "url": "https://mms.alliedmods.net/mmsdrop/1.11/mmsource-1.11.0-git1153-linux.tar.gz"
         }
       ]
     }
@@ -43,22 +39,107 @@
 
   "plugins": [
     {
-      "name": "",
+      "name": "entry template",
       "_ref": "",
+      "exclude": true,
+      "extractPath": "left4dead2/addons/sourcemod/plugins",
       "resources": [
         {
           "platform": "*",
           "url": "",
+          "archiveSubDirs": [""],
+          "archiveFiles": [""],
           "doCompile": false,
-          "compilerLocation": "",
-          "compilerParams": [
-            {
-              "in": [],
-              "out": []
-            }
-          ],
-          "extractPath": "left4dead2/addons/sourcemod/plugins",
-          "fileName": ""
+          "compilerLocation": "left4dead2/commons/addons/sourcemod/scripting/compile.sh",
+          "compilerOptions": [""],
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
+        }
+      ]
+    },
+    {
+      "name": "Command and ConVar - Buffer Overflow Fixer (2.9)",
+      "_ref": "https://forums.alliedmods.net/showthread.php?t=309656",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://www.sourcemod.net/vbcompiler.php?file_id=170776",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
+        },
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=170774&d=1676120181",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/gamedata"
+        }
+      ]
+    },
+    {
+      "name": "Source Scramble",
+      "_ref": "https://github.com/nosoop/SMExt-SourceScramble",
+      "resources": [
+        {
+          "platform": "windows",
+          "url": "https://github.com/nosoop/SMExt-SourceScramble/releases/download/0.7.1.1/package.zip",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
+        },
+        {
+          "platform": "linux",
+          "url": "https://github.com/nosoop/SMExt-SourceScramble/releases/download/0.7.1.1/package.tar.gz",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
+        }
+      ]
+    },
+    {
+      "exclude": true,
+      "name": "left4downtown2",
+      "_ref": "https://forums.alliedmods.net/showthread.php?t=134032",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=111241&d=1350927414",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
+        }
+      ]
+    },
+    {
+      "name": "Left 4 DHooks Direct (1.145)",
+      "_ref": "https://forums.alliedmods.net/showthread.php?t=321696",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=195507&d=1712139012",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons"
+        }
+      ]
+    },
+    {
+      "exclude": true,
+      "name": "SteamWorks",
+      "_ref": "https://forums.alliedmods.net/showthread.php?t=229556",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=130399&d=1391895786",
+          "doCompile": false,
+          "extractPath": ""
+        }
+      ]
+    },
+    {
+      "exclude": true,
+      "name": "Updater",
+      "_ref": "https://forums.alliedmods.net/showthread.php?t=169095",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=183438&d=1598611003",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod"
         }
       ]
     },
@@ -70,21 +151,7 @@
           "platform": "*",
           "url": "https://forums.alliedmods.net/attachment.php?s=e0406bf43fbf79b62aa35fe08eca2b58&attachmentid=122230&d=1373147952",
           "doCompile": false,
-          "extractPath": "left4dead2/addons/sourcemod/plugins",
-          "fileName": "l4dtoolz(L4D2)-1.0.0.9h.zip"
-        }
-      ]
-    },
-    {
-      "name": "left4downtown2",
-      "_ref": "https://forums.alliedmods.net/showthread.php?t=134032",
-      "resources": [
-        {
-          "platform": "*",
-          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=111241&d=1350927414",
-          "doCompile": false,
-          "extractPath": "left4dead2/addons/sourcemod/plugins",
-          "fileName": "left4downtown2-v0.5.4.2-playerslots.zip"
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
         }
       ]
     },
@@ -95,20 +162,8 @@
         {
           "platform": "*",
           "url": "https://forums.alliedmods.net/attachment.php?attachmentid=54217&d=1259334888",
-          "doCompile": true,
-          "compilerLocation": "left4dead2/commons/addons/sourcemod/scripting/compile.sh",
-          "compilerParams": [
-            {
-              "in": [
-                "bebop.sp"
-              ],
-              "out": [
-                "bebop.smx"
-              ]
-            }
-          ],
-          "extractPath": "left4dead2/addons/sourcemod/plugins",
-          "fileName": "bebop_0.2beta.zip"
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
         }
       ]
     },
@@ -118,7 +173,7 @@
       "resources": [
         {
           "platform": "*",
-          "url": "https://www.sourcemod.net/vbcompiler.php?file_id=56931",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=56932&d=1262977327",
           "doCompile": false,
           "extractPath": "left4dead2/addons/sourcemod/plugins"
         }
@@ -131,6 +186,78 @@
         {
           "platform": "*",
           "url": "https://www.sourcemod.net/vbcompiler.php?file_id=62150",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
+        }
+      ]
+    },
+    {
+      "name": "Incapped Crawling with Animation (2.9)",
+      "_ref": "https://forums.alliedmods.net/showthread.php?t=137381",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://www.sourcemod.net/vbcompiler.php?file_id=178444",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
+        },
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=104036&d=1673192879",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod"
+        }
+      ]
+    },
+    {
+      "name": "Incapped Self Help",
+      "_ref": "https://forums.alliedmods.net/showthread.php?t=129444",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://www.sourcemod.net/vbcompiler.php?file_id=68206",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
+        }
+      ]
+    },
+    {
+      "name": "Survivor Bot AI Improver",
+      "_ref": "https://forums.alliedmods.net/showthread.php?p=2804907",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=200940&d=1686749873",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
+        },
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=200673&d=1684923269",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/gamedata"
+        }
+      ]
+    },
+    {
+      "name": "Pick Up / No Auto Switch (4.3)",
+      "_ref": "https://forums.alliedmods.net/showthread.php?t=339742",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=197154&d=1664437043",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/gamedata"
+        },
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=198810&d=1672824839",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/translations"
+        },
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=198812&d=1672824839",
           "doCompile": false,
           "extractPath": "left4dead2/addons/sourcemod/plugins"
         }

@@ -5,13 +5,12 @@ from utils import logging_utils, file_utils, http_utils, SteamAppManager
 from itertools import chain
 
 steamapp_info_path = './steamapp_info.json'
-override_server_cfg = False
+override_server_cfg = True
 
 logger = logging_utils.init_logger('setup')
-logger.info('='*48)
 
 class Main:
-  cache_dir = './cache'
+  temp_download_dir = './downloads'
   template_server_cfg_path = './server.cfg'
 
   def __init__(self, session: Session):
@@ -20,7 +19,9 @@ class Main:
     self.deferred_callbacks.append(self.session.close)
     self.tmpdir, d_tmpdir = file_utils.mkdtemp()
     self.deferred_callbacks.append(d_tmpdir)
-    file_utils.ensure_dir(self.cache_dir)
+    file_utils.ensure_dir(self.temp_download_dir)
+    http_utils._cache_load()
+    self.deferred_callbacks.append(http_utils._cache_save)
 
   def exit(self):
     for cb in self.deferred_callbacks: cb()
@@ -48,14 +49,22 @@ class Main:
     )
 
     man.download_steamcmd(session=self.session)
-    # man.update_app()
+    man.update_app()
 
     for plugin in chain(meta_plugins, plugins):
       plugin_name = plugin.get('name')
+      logger.info('installing plugin: {}'.format(plugin_name))
+      plugin_exclude = plugin.get('exclude', False)
+      if plugin_exclude or plugin_name is None or plugin_name == '':
+        logger.info('plugin excluded')
+        continue
       plugin_extract_path = plugin.get('extractPath')
       plugin_resources = plugin.get('resources', [])
-      logger.info('installing plugin: {}'.format(plugin_name))
       for resource in plugin_resources:
+        resource_exclude = resource.get('exclude', False)
+        if resource_exclude:
+          logger.info('resource excluded')
+          continue
         resource_extract_path = resource.get('extractPath')
         resource_platform = resource.get('platform', use_platform)
         resource_url = resource.get('url')
@@ -74,14 +83,17 @@ class Main:
             continue
           resource_extract_path = plugin_extract_path
 
-        status, export_path, info = http_utils.download_file(self.session, resource_url, self.cache_dir)
+        status, export_path, info = http_utils.download_file(self.session, resource_url, self.temp_download_dir)
         if not status:
           logger.warning('failed to retrieve content: {} {}'.format(plugin_name, resource_url))
           continue
 
         if info.content_type == 'application/zip':
-          logger.info('extracting: {}'.format(info.file_name))
+          logger.info('extracting zip: {}'.format(info.file_name))
           file_utils.extract_zip(export_path, man.get_app_path(resource_extract_path), self.tmpdir)
+        elif info.content_type == 'application/x-xz':
+          logger.info('extracting tar.xz: {}'.format(info.file_name))
+          file_utils.extract_tar_xz(export_path, man.get_app_path(resource_extract_path), self.tmpdir)
         else:
           logger.info('copying file: {}'.format(info.file_name))
           file_utils.copy2(export_path, man.get_app_path(resource_extract_path))
