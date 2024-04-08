@@ -51,6 +51,8 @@ class Main:
     man.download_steamcmd(session=self.session)
     man.update_app()
 
+    # man.workshop_download_item_extern(self.session, 2458892093)
+
     for plugin in chain(meta_plugins, plugins):
       plugin_name = plugin.get('name')
       logger.info('installing plugin: {}'.format(plugin_name))
@@ -105,6 +107,12 @@ class Main:
     if override_server_cfg or not file_utils.isfile(server_cfg_path):
       logger.info('copying server config template')
       file_utils.copy2(self.template_server_cfg_path, server_cfg_path)
+
+    workshop_ids = steamapp_info.get('workshopIds', [])
+    if workshop_ids:
+      logger.info('downloading workshops')
+      for workshop_rel, workshop_id in workshop_ids:
+        man.workshop_download_item_extern(self.session, workshop_id)
 
     return
 

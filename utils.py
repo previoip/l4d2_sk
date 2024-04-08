@@ -186,9 +186,9 @@ class http_utils:
   s_file_info = namedtuple("FileInfo", field_names=['file_name', 'file_type',  'file_size', 'content_disposition', 'content_type'])
 
   @classmethod
-  def http_request(cls, method, session: Session, url, stream=False, max_depth=10):
+  def http_request(cls, method, session: Session, url, stream=False, max_depth=10, data=None):
     http_utils_logger.info('{} request: {}'.format(method, url))
-    resp = session.request(method, url, stream=stream)
+    resp = session.request(method, url, stream=stream, data=data)
     if resp.status_code == 200:
       return resp
     elif resp.status_code == 301 or resp.status_code == 302:
@@ -199,7 +199,7 @@ class http_utils:
         if i > max_depth//2:
           stream = False
         http_utils_logger.info('redirecting {} request (stream:{}): {}'.format(method, stream, url))
-        new_resp = session.request(method, new_url, stream=stream, allow_redirects=False)
+        new_resp = session.request(method, new_url, stream=stream, allow_redirects=False, data=data)
         if new_resp.status_code == 200:
           return new_resp
         elif resp.status_code == 301 or resp.status_code == 302:
@@ -243,9 +243,12 @@ class http_utils:
     content_disposition = headers.get('content-disposition')
     if content_disposition is None:
       file_name = cls.parse_url_filename(url)
-    else:
+    elif not re.search(r'filename=(.+)', content_disposition) is None:
       file_name = re.findall(r'filename=(.+)', content_disposition)[0].strip('"')
+    elif not re.search(r'filename\*=(.+)', content_disposition) is None:
+      file_name = re.findall(r'filename\*=(.+)', content_disposition)[0].strip('"')
     file_name = file_utils.normalize(file_name)
+    http_utils_logger.info('found filename: {}'.format(file_name))
     _, file_type = file_utils.split_file_name_format(file_name)
     content_length = headers.get('content-length')
     if content_length is None:
@@ -395,6 +398,7 @@ class http_utils:
 
 steamapp_logger = logging_utils.init_logger('steamapp_man')
 
+
 class SteamAppManager:
 
   steamcmd_file_host = 'https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip'
@@ -468,3 +472,44 @@ class SteamAppManager:
   def workshop_download_item(self, workshop_item_id):
     retcode = subprocess.call(self.prepare_args_workshop_download_item(workshop_item_id=workshop_item_id))
     return retcode
+
+  def workshop_download_item_extern(self, session: Session, workshop_item_id):
+    home = 'https://steamworkshopdownloader.io/'
+    db_hostname = 'https://db.steamworkshopdownloader.io'
+    db_api_path = 'prod/api/details/file'
+
+    data = bytes(f'[{workshop_item_id}]', 'utf8')
+    try:
+      db_resp = http_utils.http_request('POST', session=session, url='{}/{}'.format(db_hostname, db_api_path), data=data)
+    except Exception as e:
+      http_utils_logger.error(e)
+      return
+
+    workshop_db_res = json.loads(db_resp.content)
+    for workshop_ent in workshop_db_res:
+    
+      result = workshop_ent.get('result')
+      file_url = workshop_ent.get('file_url')
+      preview_url = workshop_ent.get('preview_url')
+      file_name = workshop_ent.get('filename')
+
+      if result and not file_url is None:
+        export_dir = self.get_app_path('left4dead2/addons')
+        # export_file = file_utils.path_join(export_dir, file_name)
+        file_utils.ensure_dir(export_dir)
+        fd, tmp_file_name = tempfile.mkstemp()
+        with os.fdopen(fd, 'wb') as fh:
+          try:
+            http_utils.download_file(session, file_url, export_dir, fh)
+          except Exception as e:
+            http_utils_logger.error(e)
+
+      if result and not preview_url is None:
+        export_dir = self.get_app_path('left4dead2/addons')
+        file_utils.ensure_dir(export_dir)
+        fd, tmp_file_name = tempfile.mkstemp()
+        with os.fdopen(fd, 'wb') as fh:
+          try:
+            http_utils.download_file(session, preview_url, export_dir, fh)
+          except Exception as e:
+            http_utils_logger.error(e)
