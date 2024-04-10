@@ -156,3 +156,4 @@ downloads
 cache
 log
 *.log
+t.py

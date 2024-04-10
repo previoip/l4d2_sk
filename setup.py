@@ -111,7 +111,7 @@ class Main:
     workshop_ids = steamapp_info.get('workshopIds', [])
     if workshop_ids:
       logger.info('downloading workshops')
-      for workshop_rel, workshop_id in workshop_ids:
+      for workshop_id, workshop_name, workshop_rel in workshop_ids:
         man.workshop_download_item_extern(self.session, workshop_id)
 
     return

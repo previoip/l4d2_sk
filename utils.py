@@ -63,6 +63,10 @@ class file_utils:
     s, stub = cls.split_file_name_format(s)
     # s = re.sub(r'[^\w\s-]', '', s)
     s = re.sub(r'[-\s]+', '_', s).strip('_')
+    s = s.replace('\'', '')
+    s = s.replace('"', '')
+    if s.lower().startswith('utf-8\'\'') or s.lower().startswith('utf_8\'\''):
+      s = s[5:]
     if stub:
       s = s + '.' + stub
     return s
@@ -278,7 +282,7 @@ class http_utils:
     tl = 0.0
     dl = 0.0
     total_l = info.file_size
-
+    print(info)
     try:
       for b in resp.iter_content():
         lb = len(b)
@@ -474,6 +478,7 @@ class SteamAppManager:
     return retcode
 
   def workshop_download_item_extern(self, session: Session, workshop_item_id):
+    steamapp_logger.info('retrieving workshop info: {}'.format(workshop_item_id))
     home = 'https://steamworkshopdownloader.io/'
     db_hostname = 'https://db.steamworkshopdownloader.io'
     db_api_path = 'prod/api/details/file'
@@ -492,24 +497,38 @@ class SteamAppManager:
       file_url = workshop_ent.get('file_url')
       preview_url = workshop_ent.get('preview_url')
       file_name = workshop_ent.get('filename')
+      is_collection = workshop_ent.get('show_subscribe_all', False)
+      is_collection = is_collection and not workshop_ent.get('can_subscribe', False)
+      
+      steamapp_logger.info('downloading: {}'.format(file_name))
 
-      if result and not file_url is None:
-        export_dir = self.get_app_path('left4dead2/addons')
-        # export_file = file_utils.path_join(export_dir, file_name)
-        file_utils.ensure_dir(export_dir)
-        fd, tmp_file_name = tempfile.mkstemp()
-        with os.fdopen(fd, 'wb') as fh:
-          try:
-            http_utils.download_file(session, file_url, export_dir, fh)
-          except Exception as e:
-            http_utils_logger.error(e)
+      if result: 
+        if is_collection:
+          steamapp_logger.info('workshop collection found instead, processing children')
+          for workshop_child_ent in workshop_ent.get('children'):
+            workshop_child_id = workshop_child_ent.get('publishedfileid')
+            if not workshop_child_id is None:
+              self.workshop_download_item_extern(session, workshop_child_id)
+        else:
+          if not file_url is None:
+            export_dir = self.get_app_path('left4dead2/addons')
+            # export_file = file_utils.path_join(export_dir, file_name)
+            file_utils.ensure_dir(export_dir)
+            fd, tmp_file_name = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as fh:
+              try:
+                http_utils.download_file(session, file_url, export_dir, fh)
+              except Exception as e:
+                http_utils_logger.error(e)
 
-      if result and not preview_url is None:
-        export_dir = self.get_app_path('left4dead2/addons')
-        file_utils.ensure_dir(export_dir)
-        fd, tmp_file_name = tempfile.mkstemp()
-        with os.fdopen(fd, 'wb') as fh:
-          try:
-            http_utils.download_file(session, preview_url, export_dir, fh)
-          except Exception as e:
-            http_utils_logger.error(e)
+          if not preview_url is None:
+            export_dir = self.get_app_path('left4dead2/addons')
+            file_utils.ensure_dir(export_dir)
+            fd, tmp_file_name = tempfile.mkstemp()
+            with os.fdopen(fd, 'wb') as fh:
+              try:
+                http_utils.download_file(session, preview_url, export_dir, fh)
+              except Exception as e:
+                http_utils_logger.error(e)
+      else:
+        steamapp_logger.warning('cannot retrieve workshop info: {}'.format(workshop_item_id))
