@@ -1,13 +1,16 @@
 import traceback
 import json
 from requests import Session
-from utils import logging_utils, file_utils, http_utils, SteamAppManager
 from itertools import chain
+from src.log import init_logger
+from src.steamcmd_manager import SteamAppManager
+from src.pathlib import ensure_dir, mkdtemp, archive_extract_tar, archive_extract_zip, copy2, delete_file
+from src.http_utils import download_file
 
 steamapp_info_path = './steamapp_info.json'
 override_server_cfg = True
 
-logger = logging_utils.init_logger('setup')
+logger = init_logger('setup')
 
 class Main:
   temp_download_dir = './downloads'
@@ -17,11 +20,9 @@ class Main:
     self.deferred_callbacks = list()
     self.session = session
     self.deferred_callbacks.append(self.session.close)
-    self.tmpdir, d_tmpdir = file_utils.mkdtemp()
+    self.tmpdir, d_tmpdir = mkdtemp()
     self.deferred_callbacks.append(d_tmpdir)
-    file_utils.ensure_dir(self.temp_download_dir)
-    http_utils._cache_load()
-    self.deferred_callbacks.append(http_utils._cache_save)
+    ensure_dir(self.temp_download_dir)
 
   def exit(self):
     for cb in self.deferred_callbacks: cb()
@@ -50,8 +51,6 @@ class Main:
 
     man.download_steamcmd(session=self.session)
     man.update_app()
-
-    # man.workshop_download_item_extern(self.session, 2458892093)
 
     for plugin in chain(meta_plugins, plugins):
       plugin_name = plugin.get('name')
@@ -86,27 +85,29 @@ class Main:
             continue
           resource_extract_path = plugin_extract_path
 
-        status, export_path, info = http_utils.download_file(self.session, resource_url, self.temp_download_dir, use_cache=not bool(plugin_disable_cache))
+        status, download_path, info = download_file(self.session, resource_url, self.temp_download_dir)
         if not status:
           logger.warning('failed to retrieve content: {} {}'.format(plugin_name, resource_url))
           continue
 
         if info.content_type == 'application/zip' or info.file_type == 'zip':
           logger.info('extracting zip: {}'.format(info.file_name))
-          file_utils.extract_zip(export_path, man.get_app_path(resource_extract_path), self.tmpdir)
+          archive_extract_zip(download_path, man.get_app_path(resource_extract_path), self.tmpdir)
         elif info.content_type == 'application/x-xz':
           logger.info('extracting tar.xz: {}'.format(info.file_name))
-          file_utils.extract_tar_xz(export_path, man.get_app_path(resource_extract_path), self.tmpdir)
+          archive_extract_tar(download_path, man.get_app_path(resource_extract_path), self.tmpdir)
         else:
           logger.info('copying file: {}'.format(info.file_name))
-          file_utils.copy2(export_path, man.get_app_path(resource_extract_path))
+          copy2(download_path, man.get_app_path(resource_extract_path))
+        if plugin_disable_cache:
+          delete_file(download_path)
 
     logger.info('finished installing plugins')
 
     server_cfg_path = man.get_app_path('left4dead2', 'cfg', 'server.cfg')
     if override_server_cfg or not file_utils.isfile(server_cfg_path):
       logger.info('copying server config template')
-      file_utils.copy2(self.template_server_cfg_path, server_cfg_path)
+      copy2(self.template_server_cfg_path, server_cfg_path)
 
     workshop_ids = steamapp_info.get('workshopIds', [])
     if workshop_ids:
@@ -115,7 +116,6 @@ class Main:
         man.workshop_download_item_extern(self.session, workshop_id)
 
     return
-
 
 
 if __name__ == '__main__':
