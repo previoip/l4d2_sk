@@ -1,7 +1,7 @@
 import os
 import subprocess
 from src.log import init_logger
-from src.pathlib import isfile, ensure_dir, archive_extract_zip
+from src.pathlib import isfile, ensure_dir, archive_extract_zip, delete_file
 from src.http_utils import http_request, download_file
 
 logger = init_logger('steamapp_manager', 'setup.log')
@@ -116,11 +116,16 @@ class SteamAppManager:
           if not file_url is None:
             export_dir = self.get_app_path('left4dead2/addons')
             ensure_dir(export_dir)
-            download_file(session, file_url, export_dir)
+            status, download_file_path, file_info = download_file(session, file_url, export_dir)
+            if not status and not download_file_path is None:
+              delete_file(download_file_path)
 
           if not preview_url is None:
             export_dir = self.get_app_path('left4dead2/addons')
             ensure_dir(export_dir)
-            download_file(session, preview_url, export_dir)
+            status, download_file_path, file_info = download_file(session, preview_url, export_dir)
+            if not status and not download_file_path is None:
+              delete_file(download_file_path)
+
       else:
         logger.warning('missing workshop info: {}'.format(workshop_item_id))

@@ -4,7 +4,7 @@ import requests
 import re
 from io import IOBase
 from urllib.parse import urlparse
-from time import time
+from time import time, sleep
 from collections import namedtuple
 from src.log import init_logger
 from src.pathlib import extract_file_type, ensure_dir, isfile
@@ -114,13 +114,27 @@ def parse_file_info(headers, url):
   content_length = parse_headers_content_length(headers)
   return file_info_t(file_name, file_type, content_length, content_disposition, content_type)
 
-def download_file(session, url, dst_dir, file_name='', chunk_size=4096):
+def download_file(session, url, dst_dir, file_name='', chunk_size=4096, head_err_max_retry=5):
   logger.info('retrieving file info: {}'.format(url))
 
-  resp = http_request(session, 'HEAD', url, allow_redirects=False)
-  if resp is None:
-    logger.error('unable to retrieve HEAD request')
-    return False, None, None
+  skip_get_request = False
+  err_f = False
+  for i in range(head_err_max_retry):
+    resp = http_request(session, 'HEAD', url, allow_redirects=False)
+    if resp is None:
+      logger.error('unable to retrieve HEAD request')
+      err_f = True
+      sleep(2.5)
+    else:
+      err_f = False
+      break
+  if err_f:
+    logger.warning('cannot retrieve HEAD, changing method to GET')
+    resp = http_request(session, 'GET', url, allow_redirects=False, stream=True)
+    if resp is None:
+      logger.error('unable to retrieve GET request')
+      return False, None, None
+    skip_get_request = True
 
   ensure_dir(dst_dir)
 
@@ -132,9 +146,12 @@ def download_file(session, url, dst_dir, file_name='', chunk_size=4096):
       os.unlink(dst_path)
     else:
       logger.info('file already exists: {}'.format(dst_path))
+      resp.close()
       return True, dst_path, file_info
 
-  resp = http_request(session, 'GET', url, stream=True, allow_redirects=False)
+  if not skip_get_request:
+    resp = http_request(session, 'GET', url, stream=True, allow_redirects=False)
+
   if resp is None:
     logger.error('unable to retrieve GET request')
     return False, dst_path, file_info
@@ -142,5 +159,6 @@ def download_file(session, url, dst_dir, file_name='', chunk_size=4096):
   logger.info('downloading to {}'.format(dst_path))
   with open(dst_path, 'wb') as fh:
     status = stream_to_buf(resp, fh, content_length=file_info.file_size)
+  resp.close()
 
   return status, dst_path, file_info

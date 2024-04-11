@@ -102,7 +102,8 @@ class Main:
         if plugin_disable_cache:
           delete_file(download_path)
 
-    logger.info('finished installing plugins')
+      logger.info('finished installing plugin: {}'.format(plugin_name))
+    logger.info('finished installing all plugins')
 
     server_cfg_path = man.get_app_path('left4dead2', 'cfg', 'server.cfg')
     if override_server_cfg or not file_utils.isfile(server_cfg_path):
