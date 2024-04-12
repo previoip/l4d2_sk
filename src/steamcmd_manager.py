@@ -32,6 +32,10 @@ class SteamAppManager:
     self._passwd = passwd
 
   @classmethod
+  def configure_steamcmd_path(cls, path):
+    cls.steamcmd_dir = path
+
+  @classmethod
   def get_steamcmd_path(cls, *tails):
     return os.path.join(cls.steamcmd_dir, cls.steamcmd_file_name, *tails)
 
@@ -46,7 +50,7 @@ class SteamAppManager:
   def download_steamcmd(cls, session):
     if not cls.is_steamcmd_installed():
       logger.info('downloading steamcmd')
-      status, archive_path = download_file(session, cls.steamcmd_file_host, './downloads', 'steamcmd.zip')
+      status, archive_path, _ = download_file(session, cls.steamcmd_file_host, './downloads', 'steamcmd.zip')
       if status:
         archive_extract_zip(archive_path, cls.steamcmd_dir)
       logger.info('extracted: {}'.format(cls.get_steamcmd_path()))

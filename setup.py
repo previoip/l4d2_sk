@@ -32,6 +32,7 @@ class Main:
       steamapp_info = dict(json.load(fh))
 
     man = SteamAppManager()
+    man.configure_steamcmd_path('/stemacmd')
 
     appid = steamapp_info['config'].get('appid', '550')
     appid_dedicated_server = steamapp_info['config'].get('appidDedicatedServer', '222860')
@@ -49,8 +50,8 @@ class Main:
       file_path_dedicated_server
     )
 
-    man.download_steamcmd(session=self.session)
-    man.update_app()
+    # man.download_steamcmd(session=self.session)
+    # man.update_app()
 
     for plugin in chain(meta_plugins, plugins):
       plugin_name = plugin.get('name')
