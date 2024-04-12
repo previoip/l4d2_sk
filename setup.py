@@ -132,5 +132,13 @@ if __name__ == '__main__':
   except Exception:
     logger.error(traceback.format_exc())
     errno = 1
-  main.exit()
-  logger.info('program exits{}'.format(' gracefully' if errno == 0  else ''))
+  except KeyboardInterrupt:
+    logger.error(traceback.format_exc())
+    pass
+
+  try:
+    main.exit()
+    logger.info('program exits{}'.format(' gracefully' if errno == 0  else ''))
+  except Exception:
+    logger.error(traceback.format_exc())
+
