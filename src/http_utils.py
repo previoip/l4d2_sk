@@ -7,7 +7,7 @@ from urllib.parse import urlparse
 from time import time, sleep
 from collections import namedtuple, deque
 from src.log import init_logger
-from src.pathlib import extract_file_type, ensure_dir, isfile
+from src.path_utils import extract_file_type, ensure_dir, isfile
 
 logger = init_logger('http_utils', 'setup.log')
 file_info_t = namedtuple("FileInfo", field_names=['file_name', 'file_type',  'file_size', 'content_disposition', 'content_type'])

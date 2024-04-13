@@ -1,10 +1,9 @@
 {
   "config": {
+    "appConfigName": "l4d2 dedicated server essentials",
+    "appName": "Left 4 Dead 2",
     "appid": "550",
-    "appidDedicatedServer": "222860",
-    "filePathDedicatedServer": "srcds.exe",
-    "installForceDir": "l4d2",
-    "usePlatform": "windows"
+    "appidDedicatedServer": "222860"
   },
   "metaPlugins": [
     {
@@ -13,11 +12,13 @@
       "resources": [
         {
           "platform": "windows",
-          "url": "https://sm.alliedmods.net/smdrop/1.11/sourcemod-1.11.0-git6956-windows.zip"
+          "url": "https://sm.alliedmods.net/smdrop/1.11/sourcemod-1.11.0-git6956-windows.zip",
+          "extractPath": "left4dead2"
         },
         {
           "platform": "linux",
-          "url": "https://sm.alliedmods.net/smdrop/1.11/sourcemod-1.11.0-git6956-linux.tar.gz"
+          "url": "https://sm.alliedmods.net/smdrop/1.11/sourcemod-1.11.0-git6956-linux.tar.gz",
+          "extractPath": "left4dead2"
         }
       ]
     },
@@ -27,11 +28,13 @@
       "resources": [
         {
           "platform": "windows",
-          "url": "https://mms.alliedmods.net/mmsdrop/1.11/mmsource-1.11.0-git1153-windows.zip"
+          "url": "https://mms.alliedmods.net/mmsdrop/1.11/mmsource-1.11.0-git1153-windows.zip",
+          "extractPath": "left4dead2"
         },
         {
           "platform": "linux",
-          "url": "https://mms.alliedmods.net/mmsdrop/1.11/mmsource-1.11.0-git1153-linux.tar.gz"
+          "url": "https://mms.alliedmods.net/mmsdrop/1.11/mmsource-1.11.0-git1153-linux.tar.gz",
+          "extractPath": "left4dead2"
         }
       ]
     }

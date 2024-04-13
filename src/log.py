@@ -19,6 +19,4 @@ def init_logger(name: str, file_name=None, level=logging.DEBUG, do_stream_file=T
     logger_h = logging.FileHandler(os.path.join('./log', file_name))
     logger_h.setFormatter(fmt_default)
     logger.addHandler(logger_h)
-  logger.info('')
-  logger.info(' init logger: {} '.format(name).center(48, '='))
   return logger
