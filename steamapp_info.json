@@ -87,13 +87,13 @@
           "platform": "windows",
           "url": "https://github.com/nosoop/SMExt-SourceScramble/releases/download/0.7.1.1/package.zip",
           "doCompile": false,
-          "extractPath": "left4dead2/addons/sourcemod/plugins"
+          "extractPath": "left4dead2"
         },
         {
           "platform": "linux",
           "url": "https://github.com/nosoop/SMExt-SourceScramble/releases/download/0.7.1.1/package.tar.gz",
           "doCompile": false,
-          "extractPath": "left4dead2/addons/sourcemod/plugins"
+          "extractPath": "left4dead2"
         }
       ]
     },
