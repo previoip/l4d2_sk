@@ -177,8 +177,15 @@
       "_ref": "https://forums.alliedmods.net/showthread.php?t=94415",
       "resources": [
         {
+          "exclude": true,
           "platform": "*",
           "url": "https://forums.alliedmods.net/attachment.php?attachmentid=56932&d=1262977327",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
+        },
+        {
+          "platform": "*",
+          "url": "https://www.sourcemod.net/vbcompiler.php?file_id=181866",
           "doCompile": false,
           "extractPath": "left4dead2/addons/sourcemod/plugins"
         }
@@ -263,6 +270,36 @@
         {
           "platform": "*",
           "url": "https://forums.alliedmods.net/attachment.php?attachmentid=198812&d=1672824839",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
+        }
+      ]
+    },
+    {
+      "name": "Automatic Healing (Health Regeneration) v4.14",
+      "_ref": "https://forums.alliedmods.net/showthread.php?p=2769399",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://www.sourcemod.net/vbcompiler.php?file_id=203828",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
+        },
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=203829&d=1711092787",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/scripting/include"
+        }
+      ]
+    },
+    {
+      "name": "Healing Gnome (1.17)",
+      "_ref": "https://forums.alliedmods.net/showthread.php?t=179267",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://www.sourcemod.net/vbcompiler.php?file_id=105848",
           "doCompile": false,
           "extractPath": "left4dead2/addons/sourcemod/plugins"
         }

@@ -213,7 +213,7 @@ class Main:
           for workshop_child_ent in workshop_ent.get('children'):
             workshop_child_id = workshop_child_ent.get('publishedfileid')
             if not workshop_child_id is None:
-              self.download_workshop(self.session, workshop_child_id)
+              self.download_workshop(workshop_child_id)
         else:
           workshop_resource_urls = [file_url, preview_url]
           for workshop_resource_url in workshop_resource_urls:
