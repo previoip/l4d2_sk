@@ -8,7 +8,6 @@ from zipfile import ZipFile
 import tarfile
 
 logger = init_logger('pathlib', 'setup.log')
-
 extracted_file_type_t = namedtuple('ExtractedFileType', ['src', 'file_name', 'file_extension'])
 
 def isdir(path):
@@ -20,6 +19,8 @@ def isfile(path):
 def ensure_dir(path):
   if not isdir(path):
     os.makedirs(path)
+    return path
+  return None
 
 def mkdtemp():
   temp_dir = tempfile.mkdtemp()
@@ -54,7 +55,7 @@ def rmtree_d(path):
 
 def copy2(src, dst):
   ensure_dir(os.path.dirname(dst))
-  shutil.copy2(src, dst)
+  return shutil.copy2(src, dst)
 
 def copy2_r(src, dst):
   for root, dirs, files, in os.walk(src):
@@ -96,4 +97,4 @@ def archive_extract_tar(path, dst, tmpdir=None):
   if tmpdir is None:
     d_tar_tempdir()
   else:
-    rmtree_d(zip_tempdir)
+    rmtree_d(tar_tempdir)
