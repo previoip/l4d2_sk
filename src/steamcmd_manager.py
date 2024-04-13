@@ -1,7 +1,7 @@
 import os
 import subprocess
 from src.log import init_logger
-from src.pathlib import isfile, ensure_dir, archive_extract_zip
+from src.pathlib import isfile, ensure_dir, archive_extract_zip, delete_file
 from src.http_utils import http_request, download_file
 
 logger = init_logger('steamapp_manager', 'setup.log')
@@ -32,6 +32,10 @@ class SteamAppManager:
     self._passwd = passwd
 
   @classmethod
+  def configure_steamcmd_path(cls, path):
+    cls.steamcmd_dir = path
+
+  @classmethod
   def get_steamcmd_path(cls, *tails):
     return os.path.join(cls.steamcmd_dir, cls.steamcmd_file_name, *tails)
 
@@ -46,7 +50,7 @@ class SteamAppManager:
   def download_steamcmd(cls, session):
     if not cls.is_steamcmd_installed():
       logger.info('downloading steamcmd')
-      status, archive_path = download_file(session, cls.steamcmd_file_host, './downloads', 'steamcmd.zip')
+      status, archive_path, _ = download_file(session, cls.steamcmd_file_host, './downloads', 'steamcmd.zip')
       if status:
         archive_extract_zip(archive_path, cls.steamcmd_dir)
       logger.info('extracted: {}'.format(cls.get_steamcmd_path()))
@@ -82,14 +86,16 @@ class SteamAppManager:
 
   def workshop_download_item_extern(self, session, workshop_item_id):
     logger.info('retrieving workshop info: {}'.format(workshop_item_id))
+
     home = 'https://steamworkshopdownloader.io/'
     db_hostname = 'https://db.steamworkshopdownloader.io'
     db_api_path = 'prod/api/details/file'
-    data = bytes(f'[{workshop_item_id}]', 'utf8')
 
+    data = bytes(f'[{workshop_item_id}]', 'utf8')
     db_resp = http_request(session, 'POST', url='{}/{}'.format(db_hostname, db_api_path), data=data)
     if db_resp is None:
       logger.warning('cannot retrieve workshop info: {}'.format(workshop_item_id))
+      return
 
     # workshop_db_res = json.loads(db_resp.content)
     workshop_db_res = db_resp.json()
@@ -102,7 +108,7 @@ class SteamAppManager:
       file_name = workshop_ent.get('filename')
       is_collection = workshop_ent.get('show_subscribe_all', False)
       is_collection = is_collection and not workshop_ent.get('can_subscribe', False)
-      
+
       logger.info('downloading workshop: {}'.format(file_name))
 
       if result: 
@@ -113,14 +119,13 @@ class SteamAppManager:
             if not workshop_child_id is None:
               self.workshop_download_item_extern(session, workshop_child_id)
         else:
-          if not file_url is None:
-            export_dir = self.get_app_path('left4dead2/addons')
-            ensure_dir(export_dir)
-            download_file(session, file_url, export_dir)
-
-          if not preview_url is None:
-            export_dir = self.get_app_path('left4dead2/addons')
-            ensure_dir(export_dir)
-            download_file(session, preview_url, export_dir)
+          workshop_resource_urls = [file_url, preview_url]
+          for workshop_resource_url in workshop_resource_urls:
+            if not workshop_resource_url is None:
+              export_dir = self.get_app_path('left4dead2/addons')
+              ensure_dir(export_dir)
+              status, download_file_path, file_info = download_file(session, workshop_resource_url, export_dir)
+              if not status and not download_file_path is None:
+                delete_file(download_file_path)
       else:
         logger.warning('missing workshop info: {}'.format(workshop_item_id))

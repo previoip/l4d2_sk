@@ -8,7 +8,7 @@ from src.pathlib import ensure_dir, mkdtemp, archive_extract_tar, archive_extrac
 from src.http_utils import download_file
 
 steamapp_info_path = './steamapp_info.json'
-override_server_cfg = True
+override_server_cfg = False
 
 logger = init_logger('setup')
 
@@ -32,6 +32,7 @@ class Main:
       steamapp_info = dict(json.load(fh))
 
     man = SteamAppManager()
+    man.configure_steamcmd_path('/stemacmd')
 
     appid = steamapp_info['config'].get('appid', '550')
     appid_dedicated_server = steamapp_info['config'].get('appidDedicatedServer', '222860')
@@ -49,8 +50,8 @@ class Main:
       file_path_dedicated_server
     )
 
-    man.download_steamcmd(session=self.session)
-    man.update_app()
+    # man.download_steamcmd(session=self.session)
+    # man.update_app()
 
     for plugin in chain(meta_plugins, plugins):
       plugin_name = plugin.get('name')
@@ -102,7 +103,8 @@ class Main:
         if plugin_disable_cache:
           delete_file(download_path)
 
-    logger.info('finished installing plugins')
+      logger.info('finished installing plugin: {}'.format(plugin_name))
+    logger.info('finished installing all plugins')
 
     server_cfg_path = man.get_app_path('left4dead2', 'cfg', 'server.cfg')
     if override_server_cfg or not file_utils.isfile(server_cfg_path):
@@ -131,5 +133,13 @@ if __name__ == '__main__':
   except Exception:
     logger.error(traceback.format_exc())
     errno = 1
-  main.exit()
-  logger.info('program exits{}'.format(' gracefully' if errno == 0  else ''))
+  except KeyboardInterrupt:
+    logger.error(traceback.format_exc())
+    pass
+
+  try:
+    main.exit()
+    logger.info('program exits{}'.format(' gracefully' if errno == 0  else ''))
+  except Exception:
+    logger.error(traceback.format_exc())
+
