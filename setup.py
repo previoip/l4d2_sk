@@ -8,7 +8,7 @@ from src.pathlib import ensure_dir, mkdtemp, archive_extract_tar, archive_extrac
 from src.http_utils import download_file
 
 steamapp_info_path = './steamapp_info.json'
-override_server_cfg = True
+override_server_cfg = False
 
 logger = init_logger('setup')
 

@@ -126,7 +126,7 @@ def parse_file_info(headers, url):
   file_name = parse_headers_file_name(headers)
   if not file_name:
     file_name = url_basename(url)
-  file_type = extract_file_type(file_name)
+  _, _, file_type = extract_file_type(file_name)
   content_type = parse_headers_content_type(headers)
   content_length = parse_headers_content_length(headers)
   return file_info_t(file_name, file_type, content_length, content_disposition, content_type)
