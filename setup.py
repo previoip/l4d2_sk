@@ -192,7 +192,7 @@ class Main:
     data = bytes(f'[{workshop_id}]', 'utf8')
     db_resp = http_request(self.session, 'POST', url='{}/{}'.format(db_hostname, db_api_path), data=data)
     if db_resp is None:
-      logger.warning('cannot retrieve workshop info: {}'.format(workshop_item_id))
+      logger.warning('cannot retrieve workshop info: {}'.format(workshop_id))
       return
     workshop_db_res = db_resp.json()
 

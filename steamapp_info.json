@@ -319,7 +319,7 @@
         },
         {
           "platform": "*",
-          "url": "https://www.sourcemod.net/vbcompiler.php?file_id=105848",
+          "url": "https://www.sourcemod.net/vbcompiler.php?file_id=199749",
           "doCompile": false,
           "extractPath": "left4dead2/addons/sourcemod/plugins"
         },
