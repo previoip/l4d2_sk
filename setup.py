@@ -122,7 +122,10 @@ class Main:
   @classmethod
   def _iter_workshops(cls, l):
     for workshop_ent in l:
-      yield cls.workshop_t(*workshop_ent)
+      include, workshop_id, workshop_name, workshop_rel = workshop_ent
+      if not include:
+        continue
+      yield cls.workshop_t(workshop_id, workshop_name, workshop_rel)
 
   def iter_workshops(self):
     yield from self._iter_workshops(self.steamapp_info.get('workshopIds', []))

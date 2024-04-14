@@ -330,17 +330,41 @@
           "extractPath": "left4dead2/addons/sourcemod/gamedata"
         }
       ]
+    },
+    {
+      "name": "Incapped Weapons Patch (1.36)",
+      "_ref": "https://forums.alliedmods.net/showthread.php?t=322859",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=199675&d=1711406277",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
+        },
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=198873&d=1673191665",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod"
+        },
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=199674&d=1676887926",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/gamedata"
+        }
+      ]
     }
   ],
   "workshopIds": [
-    [2458892093, "Lord Of The Rings Campaign (Part 1/2)", "https://steamcommunity.com/sharedfiles/filedetails/?id=2458892093"],
-    [2465072250, "Lord Of The Rings Campaign (Part 2/2)", "https://steamcommunity.com/sharedfiles/filedetails/?id=2465072250"],
-    [575682109, "Dark Wood Extended [Collection]", "https://steamcommunity.com/workshop/filedetails/?id=575682109"],
-    [170392241, "Yama_l4d [Collection]", "https://steamcommunity.com/workshop/filedetails/?id=170392241"],
-    [1920866468, "Evil Dead 2 Cabin [Materials]", "https://steamcommunity.com/sharedfiles/filedetails/?id=1920866468"],
-    [1920871779, "Evil Dead 2 Cabin", "https://steamcommunity.com/sharedfiles/filedetails/?id=1920871779"],
-    [1910147798, "Warcelona", "https://steamcommunity.com/sharedfiles/filedetails/?id=1910147798"],
-    [1646203073, "Chernobyl: Chapter One [Collection]", "https://steamcommunity.com/workshop/filedetails/?id=1646203073"]
+    [false, 2458892093, "Lord Of The Rings Campaign (Part 1/2)", "https://steamcommunity.com/sharedfiles/filedetails/?id=2458892093"],
+    [false, 2465072250, "Lord Of The Rings Campaign (Part 2/2)", "https://steamcommunity.com/sharedfiles/filedetails/?id=2465072250"],
+    [false, 575682109, "Dark Wood Extended [Collection]", "https://steamcommunity.com/workshop/filedetails/?id=575682109"],
+    [false, 170392241, "Yama_l4d [Collection]", "https://steamcommunity.com/workshop/filedetails/?id=170392241"],
+    [false, 1920866468, "Evil Dead 2 Cabin [Materials]", "https://steamcommunity.com/sharedfiles/filedetails/?id=1920866468"],
+    [false, 1920871779, "Evil Dead 2 Cabin", "https://steamcommunity.com/sharedfiles/filedetails/?id=1920871779"],
+    [false, 1910147798, "Warcelona", "https://steamcommunity.com/sharedfiles/filedetails/?id=1910147798"],
+    [false, 1646203073, "Chernobyl: Chapter One [Collection]", "https://steamcommunity.com/workshop/filedetails/?id=1646203073"]
   ]
 
 }
