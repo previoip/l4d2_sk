@@ -162,6 +162,8 @@
     },
     {
       "name": "bebop",
+      "exclude": true,
+      "_comment": "plugin already recompiled on target env, set to false to enable redownload",
       "_ref": "https://forums.alliedmods.net/showthread.php?p=1000446",
       "resources": [
         {
@@ -302,6 +304,30 @@
           "url": "https://www.sourcemod.net/vbcompiler.php?file_id=105848",
           "doCompile": false,
           "extractPath": "left4dead2/addons/sourcemod/plugins"
+        }
+      ]
+    },
+    {
+      "name": "M60_GrenadeLauncher_patches",
+      "_ref": "https://forums.alliedmods.net/showthread.php?t=323408",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://www.sourcemod.net/vbcompiler.php?file_id=180886",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
+        },
+        {
+          "platform": "*",
+          "url": "https://www.sourcemod.net/vbcompiler.php?file_id=105848",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
+        },
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=189816&d=1623859602",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/gamedata"
         }
       ]
     }
