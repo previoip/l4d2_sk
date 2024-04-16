@@ -156,14 +156,14 @@
           "platform": "*",
           "url": "https://forums.alliedmods.net/attachment.php?s=e0406bf43fbf79b62aa35fe08eca2b58&attachmentid=122230&d=1373147952",
           "doCompile": false,
-          "extractPath": "left4dead2/addons/sourcemod/plugins"
+          "extractPath": "left4dead2/addons"
         }
       ]
     },
     {
       "name": "bebop",
       "exclude": true,
-      "_comment": "plugin already recompiled on target env, set to false to enable redownload",
+      "_comment": "unworkable. records preserved as legacy. see MultiSlots",
       "_ref": "https://forums.alliedmods.net/showthread.php?p=1000446",
       "resources": [
         {
@@ -171,6 +171,42 @@
           "url": "https://forums.alliedmods.net/attachment.php?attachmentid=54217&d=1259334888",
           "doCompile": false,
           "extractPath": "left4dead2/addons/sourcemod/plugins"
+        }
+      ]
+    },
+    {
+      "name": "MultiSlots",
+      "_ref": "https://forums.alliedmods.net/showthread.php?p=1239544",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://www.sourcemod.net/vbcompiler.php?file_id=69674",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
+        },
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=69686&d=1279172270",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/gamedata"
+        }
+      ]
+    },
+    {
+      "name": "Survivor AFK Fix (1.2)",
+      "_ref": "https://forums.alliedmods.net/showthread.php?p=1239544",
+      "resources": [
+        {
+          "platform": "*",
+          "url": "https://www.sourcemod.net/vbcompiler.php?file_id=73422",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/plugins"
+        },
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=69687&d=1279172316",
+          "doCompile": false,
+          "extractPath": "left4dead2/addons/sourcemod/gamedata"
         }
       ]
     },
