@@ -5,6 +5,26 @@
     "appid": "550",
     "appidDedicatedServer": "222860"
   },
+
+  "compilerPresets": {
+    "sourcemodSourcePawn": [
+      {
+        "platform": "windows",
+        "acceptFileType": "*.sp",
+        "execPath": "left4dead2/addons/sourcemod/scripting/compile.exe",
+        "compiledDstPath": "left4dead2/addons/sourcemod/scripting/compiled",
+        "extractPath": "left4dead2/addons/sourcemod/plugins"
+      },
+      {
+        "platform": "linux",
+        "acceptFileType": "*.sp",
+        "execPath": "left4dead2/addons/sourcemod/scripting/compile.sh",
+        "compiledDstPath": "left4dead2/addons/sourcemod/scripting/compiled",
+        "extractPath": "left4dead2/addons/sourcemod/plugins"
+      }
+
+    ]
+  },
   "metaPlugins": [
     {
       "name": "sourcemod",
@@ -180,9 +200,17 @@
       "resources": [
         {
           "platform": "*",
+          "exclude": true,
           "url": "https://www.sourcemod.net/vbcompiler.php?file_id=69674",
           "doCompile": false,
           "extractPath": "left4dead2/addons/sourcemod/plugins"
+        },
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=69674&d=1279161226",
+          "doCompile": true,
+          "compilerPresetName":"sourcemodSourcePawn",
+          "extractPath": "left4dead2/addons/sourcemod/scripting"
         },
         {
           "platform": "*",
@@ -194,7 +222,7 @@
     },
     {
       "name": "Survivor AFK Fix (1.2)",
-      "_ref": "https://forums.alliedmods.net/showthread.php?p=1239544",
+      "_ref": "https://forums.alliedmods.net/showthread.php?t=132409",
       "resources": [
         {
           "platform": "*",
@@ -319,15 +347,16 @@
       "resources": [
         {
           "platform": "*",
-          "url": "https://www.sourcemod.net/vbcompiler.php?file_id=203828",
-          "doCompile": false,
-          "extractPath": "left4dead2/addons/sourcemod/plugins"
-        },
-        {
-          "platform": "*",
           "url": "https://forums.alliedmods.net/attachment.php?attachmentid=203829&d=1711092787",
           "doCompile": false,
           "extractPath": "left4dead2/addons/sourcemod/scripting/include"
+        },
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=69674&d=1279161226",
+          "doCompile": true,
+          "compilerPresetName": "sourcemodSourcePawn",
+          "extractPath": "left4dead2/addons/sourcemod/scripting"
         }
       ]
     },

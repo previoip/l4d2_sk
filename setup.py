@@ -3,11 +3,13 @@ import traceback
 import json
 import os.path
 import configparser
+import subprocess
+import glob
 from requests import Session
 from itertools import chain
 from collections import namedtuple
 from src.log import init_logger
-from src.path_utils import ensure_dir, mkdtemp, archive_extract_tar, archive_extract_zip, copy2, delete_file, isfile
+from src.path_utils import ensure_dir, mkdtemp, archive_extract_tar, archive_extract_zip, copy2, delete_file, isfile, copy2_r, rmtree_d
 from src.http_utils import download_file, http_request
 
 logger = init_logger('setup', 'setup.log')
@@ -64,7 +66,7 @@ class SetupConfig:
 class Main:
   downloads_dir = './downloads'
   plugin_t = namedtuple('PluginEnt', ['name', 'resources', 'disable_cache'])
-  resource_t = namedtuple('ResourceEnt', ['url', 'extract_path', 'disable_cache'])
+  resource_t = namedtuple('ResourceEnt', ['url', 'extract_path', 'disable_cache', 'do_compile', 'compiler_preset_name'])
   workshop_t = namedtuple('WorkshopEnt', ['workshop_id', 'name', 'rel'])
   setup_config = SetupConfig
   
@@ -114,7 +116,9 @@ class Main:
       resource_disable_cache = resource.get('disableCache', False)
       resource_extract_path = resource.get('extractPath', '')
       resource_url = resource.get('url')
-      yield cls.resource_t(resource_url, resource_extract_path, resource_disable_cache)
+      resource_do_compile = resource.get('doCompile', False)
+      resource_compiler_preset_name = resource.get('compilerPresetName')
+      yield cls.resource_t(resource_url, resource_extract_path, resource_disable_cache, resource_do_compile, resource_compiler_preset_name)
 
   def iter_plugins(self):
     yield from self._iter_plugins(self.steamapp_info)
@@ -184,8 +188,43 @@ class Main:
       else:
         logger.info('copying file: {}'.format(info.file_name))
         copy2(download_path, os.path.join(target_dir, info.file_name))
+      
       if plugin_ent.disable_cache:
         delete_file(download_path)
+
+      if resource_ent.do_compile and resource_ent.compiler_preset_name:
+        logger.info('recompiling plugin: {}'.format(resource_ent.compiler_preset_name))
+        compiler_preset = self.steamapp_info.get('compilerPresets', {}).get(resource_ent.compiler_preset_name)
+        if not compiler_preset:
+          logger.warning('compiler preset name is not recognized: {}'.format(resource_ent.compiler_preset_name))
+          return
+        compiler_preset = list(filter(lambda x: x.get('platform') == self.setup_config.platform, compiler_preset))
+        if not compiler_preset:
+          logger.warning('compiler preset for platform is not recognized: {} {}'.format(self.setup_config.platform, resource_ent.compiler_preset_name))
+          return
+        compiler_preset = compiler_preset[0]
+
+        exec_path = compiler_preset.get('execPath')
+        compiled_dst_path = compiler_preset.get('compiledDstPath')
+        extract_path = compiler_preset.get('extractPath')
+
+        exec_path = self.setup_config.get_app_path(exec_path)
+        compiled_dst_path = self.setup_config.get_app_path(compiled_dst_path)
+        extract_path = self.setup_config.get_app_path(extract_path)
+
+        target_file = os.path.join(target_dir, info.file_name)
+        subprocess.call([exec_path, os.path.abspath(target_file)])
+        copy2_r(compiled_dst_path, extract_path)
+        rmtree_d(compiled_dst_path)
+
+        # file_type_fmt = compiler_preset.get('acceptFileType', '')
+        # target_files = glob.glob(os.path.join(target_dir, file_type_fmt))
+        # for target_file in target_files:
+        #   target_file = self.setup_config.get_app_path(target_file)
+        #   subprocess.call([exec_path, os.path.abspath(target_file)])
+        #   copy2_r(compiled_dst_path, extract_path)
+        #   rmtree_d(compiled_dst_path)
+
     logger.info('finished installing plugin: {}'.format(plugin_ent.name))
 
   def download_workshop(self, workshop_id):
