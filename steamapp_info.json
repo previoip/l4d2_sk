@@ -200,12 +200,12 @@
       "resources": [
         {
           "platform": "*",
-          "exclude": true,
           "url": "https://www.sourcemod.net/vbcompiler.php?file_id=69674",
           "doCompile": false,
           "extractPath": "left4dead2/addons/sourcemod/plugins"
         },
         {
+          "exclude": true,
           "platform": "*",
           "url": "https://forums.alliedmods.net/attachment.php?attachmentid=69674&d=1279161226",
           "doCompile": true,
@@ -250,10 +250,18 @@
           "extractPath": "left4dead2/addons/sourcemod/plugins"
         },
         {
+          "exclude": true,
           "platform": "*",
           "url": "https://www.sourcemod.net/vbcompiler.php?file_id=181866",
           "doCompile": false,
           "extractPath": "left4dead2/addons/sourcemod/plugins"
+        },
+        {
+          "platform": "*",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=56931&d=1262977323",
+          "doCompile": true,
+          "compilerPresetName":"sourcemodSourcePawn",
+          "extractPath": "left4dead2/addons/sourcemod/scripting"
         }
       ]
     },
@@ -353,7 +361,7 @@
         },
         {
           "platform": "*",
-          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=69674&d=1279161226",
+          "url": "https://forums.alliedmods.net/attachment.php?attachmentid=203828&d=1711092787",
           "doCompile": true,
           "compilerPresetName": "sourcemodSourcePawn",
           "extractPath": "left4dead2/addons/sourcemod/scripting"
