@@ -243,7 +243,6 @@
       "_ref": "https://forums.alliedmods.net/showthread.php?t=94415",
       "resources": [
         {
-          "exclude": true,
           "platform": "*",
           "url": "https://forums.alliedmods.net/attachment.php?attachmentid=56932&d=1262977327",
           "doCompile": false,
@@ -257,6 +256,7 @@
           "extractPath": "left4dead2/addons/sourcemod/plugins"
         },
         {
+          "exclude": true,
           "platform": "*",
           "url": "https://forums.alliedmods.net/attachment.php?attachmentid=56931&d=1262977323",
           "doCompile": true,
